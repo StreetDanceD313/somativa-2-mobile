@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CameraGalery</string>
+    <string name="image_from_camera">Image From Camera</string>
+    <string name="tirar_a_foto">Tirar a Foto</string>
+    <string name="adicionar_foto">Adicionar Foto</string>
+    <string name="pegar_da_galeria">Pegar da Galeria</string>
+</resources>
