@@ -3,6 +3,7 @@ package pucpr.br.cameragalery.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.util.function.Function;
 
 import pucpr.br.cameragalery.R;
 import pucpr.br.cameragalery.model.Foto;
@@ -23,10 +26,10 @@ import pucpr.br.cameragalery.repository.GaleryRepository;
 public class FotoAdapter extends
     RecyclerView.Adapter<FotoAdapter.ViewHolder>{
 
-    private static ClickListener clickListener;
+    private ClickListener clickListener;
 
-    public static void setClickListener(ClickListener clickListener) {
-        FotoAdapter.clickListener = clickListener;
+    public void setClickListener(ClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
     @NonNull

@@ -7,13 +7,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,6 +50,7 @@ public class RegisterPicture extends AppCompatActivity {
     ImageView imageViewCamera;
     String picturePath;
 
+    Boolean grayScaleApplied;
 
     ConstraintLayout constraintLayoutRegister;
     RecyclerView recyclerView;
@@ -53,6 +59,7 @@ public class RegisterPicture extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        grayScaleApplied = false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         imageViewCamera = findViewById(R.id.imageViewCamera);
@@ -67,14 +74,9 @@ public class RegisterPicture extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
         galeryRepository = GaleryRepository.getInstance();
@@ -100,6 +102,7 @@ public class RegisterPicture extends AppCompatActivity {
                                     )
                             )
                     );
+                    grayScaleApplied = false;
                     Log.d("ChangeSelectedId",galeryRepository.getSelectedId().toString());
                 }
 
@@ -111,6 +114,7 @@ public class RegisterPicture extends AppCompatActivity {
                 adapter.notifyItemRemoved(position);
                 return true;
             }
+
         });
 
         recyclerView.setAdapter(adapter);
@@ -140,6 +144,46 @@ public class RegisterPicture extends AppCompatActivity {
             sendCameraIntent();
         }
 
+    }
+    public void buttonGrayScale(View view){
+        Log.d("grayScale","Clicou no Botão.");
+        String path = galeryRepository.getFotos().get(Integer.parseInt(galeryRepository.getSelectedId().toString())).getPath();
+        if(galeryRepository.getSelectedId() != null){
+            if(grayScaleApplied){
+                File f = new File(path);
+                imageViewCamera.setImageURI(Uri.fromFile(f));
+                grayScaleApplied = false;
+            }else{
+                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                bitmap = toGrayscale(bitmap);
+                imageViewCamera.setImageBitmap(bitmap);
+                grayScaleApplied = true;
+            }
+
+        }else{
+            Toast.makeText(
+                    RegisterPicture.this,
+                    "Selecione uma Foto para aplicar o Filtro",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
+    }
+
+    public Bitmap toGrayscale(Bitmap bmpOriginal)
+    {
+        int width, height;
+        height = bmpOriginal.getHeight();
+        width = bmpOriginal.getWidth();
+
+        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmpGrayscale);
+        Paint paint = new Paint();
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+        paint.setColorFilter(f);
+        c.drawBitmap(bmpOriginal, 0, 0, paint);
+        return bmpGrayscale;
     }
 
     public void buttonGaleryClick(View view){
